@@ -30,7 +30,7 @@ def t_build_sql():
 def t_build_delete():
     predicate = {"primaryName": "Tom Hanks", "birthYear": 1960}
     svc = get_svc()
-    res = svc.build_delete("s23_w4111_hw2_yy5", "name_basics_all",
+    res = svc.build_delete("s23_w4111_hw2_yy3242", "name_basics_all",
                                  predicate)
 
     print("t_build_delete: clause=", res)

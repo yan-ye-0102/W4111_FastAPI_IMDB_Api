@@ -19,7 +19,7 @@ class MySQLDataServiceConfig:
     Class with configuration information
     """
 
-    def __init__(self, user="root", pw="dbuserdbuser", db=None, host="localhost", port=3306,
+    def __init__(self, user="root", pw="Mysql0925Yy!", db=None, host="localhost", port=3306,
                  autocommit=True, cursorclass=pymysql.cursors.DictCursor):
         """
         TODO This signature and method is lazy and sloppy. The defaults should not be hardcoded
@@ -166,6 +166,39 @@ class MySQLDataService(BaseDataService):
             where_clause = " where " + " and ".join(terms)
 
         return where_clause, args
+    
+    @staticmethod
+    def predicate_to_set_clause_args(predicate):
+        """
+
+        :param predicate: A dictionary of properties and values.
+        :return:
+            - A SQL where clause of the form "where k1=%s and k2=%s ..." for keys in the predicate
+            - A list of the form [v1, v2, ...] with the values
+        """
+
+        # The default is no where clause or args.
+        where_clause = ""
+        args = None
+
+        if predicate:
+
+            terms = []
+            args = []
+
+            # For each key value pair.
+            for k, v in predicate.items():
+
+                # Add a clause of the form k=%s to be included in where clause.
+                terms.append(k + "=%s")
+
+                # Add the value for k into the args for statement.
+                args.append(v)
+
+            # Form the where clause by joing the k=%s into a string separated by AND.
+            where_clause = " set " + ",".join(terms)
+
+        return where_clause, args
 
     @staticmethod
     def build_select(database, collection, predicate, project):
@@ -182,6 +215,17 @@ class MySQLDataService(BaseDataService):
             [c1, c2, c3] results in "select c1, c2, c3 from ..."
         :return: A parameterized select statement and the args for the statement.
         """
+        wc, args = MySQLDataService.predicate_to_where_clause_args(predicate)
+
+        if project:
+            select_clause = ",".join(project)
+        else:
+            select_clause = "*"
+
+        sql = "select " + select_clause + " from " + \
+              database + "." + collection + wc
+
+        return sql, args
 
     @staticmethod
     def build_delete(database, collection, predicate):
@@ -196,6 +240,9 @@ class MySQLDataService(BaseDataService):
                 where k1=v1 and k2=v2 and k3=v3.
         :return: A parameterized select statement and the args for the statement.
         """
+        wc, args = MySQLDataService.predicate_to_where_clause_args(predicate)
+        query = f"DELETE FROM {database}.{collection}{wc}"
+        return query, args
 
     @staticmethod
     def build_update(database, collection, predicate, new_values):
@@ -211,6 +258,11 @@ class MySQLDataService(BaseDataService):
         :param The values to set in the rows.
         :return: A parameterized select statement and the args for the statement.
         """
+        wc, args = MySQLDataService.predicate_to_where_clause_args(predicate)
+        sc, args2 = MySQLDataService.predicate_to_where_clause_args(new_values)
+        query=f"UPDATE {database}.{collection}{sc}{wc}"
+        return query, args2 + args
+
 
     def retrieve(self, database, collection, predicate, project):
         """
@@ -228,7 +280,7 @@ class MySQLDataService(BaseDataService):
         conn = self.get_connection()
 
         sql, args = self.build_select(database, collection, predicate, project)
-        result = self.run_q(sql, args, None, True)
+        result = self.run_q(sql, args, conn, True)
         return result
 
     #
@@ -247,6 +299,10 @@ class MySQLDataService(BaseDataService):
             k1 = v1 AND k2 = v2 AND ... ...
         :return: A list containing dictionaries of the projected properties for matching entities.
         """
+        conn = self.get_connection()
+        sql, args = self.build_delete(database, collection, predicate)
+        result = self.run_q(sql, args, conn, False)
+        return result
 
     def update(self, database, collection, predicate, new_data):
         """
@@ -272,4 +328,19 @@ class MySQLDataService(BaseDataService):
         """
 
 
+    def retrieve_by_key(self, database, collection, key_field_values):
+        """
+        Query the data service/database and return matching items.
 
+        :param database: The database.
+        :param collection: In MySQL, this would be a table. In MongoDB this is a collection.
+        :param predicate: A dictionary of the form {k, v}. A entity matches if the resource's property v has
+            value k, for all entries in the dictionary. That is, a match if logically
+            k1 = v1 AND k2 = v2 AND ... ...
+        :param project: A list of subsets of the entity's properties to return. That is, if the list is
+            [k1, k2, k3], this is logically like SELECT k1, k2, k3 ...
+        :return: A list containing dictionaries of the projected properties for matching entities.
+        """
+    def create(self, database, collection, new_element):
+        """
+        """
