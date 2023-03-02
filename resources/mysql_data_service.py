@@ -283,6 +283,16 @@ class MySQLDataService(BaseDataService):
         result = self.run_q(sql, args, conn, True)
         return result
 
+    def retrieve_by_key(self, database, collection, key_columns):
+        """
+        Query the data service/database and return matching items.
+
+        :param database: The database.
+        :param collection: In MySQL, this would be a table. In MongoDB this is a collection.
+        :param key_columns: List of the values for the key columns.
+        :return:The resource with the primary key matching the values.
+        """
+        raise NotImplemented()
     #
     # TODO Students implement the following operations.
     # Will add later when defining HW assignments.
@@ -317,7 +327,7 @@ class MySQLDataService(BaseDataService):
         :return: A list containing dictionaries of the projected properties for matching entities.
         """
 
-    def insert(self, database, collection, new_data):
+    def create(self, database, collection, new_data):
         """
         Query the data service/database and return matching items.
 
