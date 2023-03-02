@@ -239,7 +239,7 @@ class ArtistResource(BaseResource):
     
 
 
-    def delete(self, primaryName=None, birthYear=None, deathYear=None):
+    def update(self, newValues, primaryName=None, birthYear=None, deathYear=None, ):
 
         result = None
 
@@ -257,7 +257,7 @@ class ArtistResource(BaseResource):
         if deathYear:
             predicate['deathYear'] = deathYear
 
-        result = ds.delete(self.database, self.collection, predicate)
+        result = ds.update(self.database, self.collection, predicate, newValues)
 
         # Get on a path like /api/artists/id returns a single resource.
         # The collection query returns a list of matching resources.
