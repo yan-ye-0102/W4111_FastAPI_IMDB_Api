@@ -10,6 +10,8 @@ def mock_svc():
 	with patch("resources.mysql_data_service.MySQLDataService.get_connection"):
 		yield svc
 
-
-MOCK_DB = {}
-
+@pytest.fixture
+def svc()-> MySQLDataService:
+    config = MySQLDataServiceConfig()
+    svc = MySQLDataService(config)
+    return svc

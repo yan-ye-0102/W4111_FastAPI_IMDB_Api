@@ -6,13 +6,14 @@
 # Uses pymysql for interacting with MySQL
 #
 import pymysql
-
+import logging
 # We will use multiple databases over the semester.
 # To simplify REST resource implementation and loosely couple application logic to data access.
 # In many cases, the design allows modifying the database without affecting application logic.
 #
 from resources.base_data_service import BaseDataService
 
+LOGGER = logging.getLogger(__name__)
 
 class MySQLDataServiceConfig:
 	"""
@@ -126,7 +127,7 @@ class MySQLDataService(BaseDataService):
 		# We catch the exception to ensure that we close the connection on an error.
 		#
 		except Exception as e:
-			pass
+			LOGGER.error(e)
 
 		# Close the connection if we created it.
 		if con_created:
@@ -278,7 +279,7 @@ class MySQLDataService(BaseDataService):
 		:return: A parameterized select statement and the args for the statement.
 		"""
 		column_names = ",".join(new_data.keys())
-		placeholder = "%s " * len(new_data)
+		placeholder = ",".join(["%s " for _ in range(len(new_data))])
 		query = f"INSERT INTO {database}.{collection} ({column_names}) VALUES ({placeholder})"
 		return query, list(new_data.values())
 
@@ -300,6 +301,7 @@ class MySQLDataService(BaseDataService):
 
 		sql, args = self.build_select(database, collection, predicate, project)
 		result = self.run_q(sql, args, conn, True)
+		print(result)
 		return result
 
 	def retrieve_by_key(self, database, collection, key_columns):
@@ -360,6 +362,7 @@ class MySQLDataService(BaseDataService):
 		:return: A list containing dictionaries of the projected properties for matching entities.
 		"""
 		conn = self.get_connection()
-		sql, args = self.build_update(database, collection, new_data)
+		sql, args = self.build_create(database, collection, new_data)
 		result = self.run_q(sql, args, conn, True)
 		return result
+		

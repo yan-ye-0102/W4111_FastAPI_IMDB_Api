@@ -66,6 +66,35 @@ def test_build_create(mock_svc):
 	sql, args = mock_svc.build_create("s23_w4111_hw2_yy3242", "name_basics_all", newValues)
 
 	# Then
-	assert sql == "INSERT INTO s23_w4111_hw2_yy3242.name_basics_all (primaryName,birthYear) VALUES (%s %s )"
+	assert sql == "INSERT INTO s23_w4111_hw2_yy3242.name_basics_all (primaryName,birthYear) VALUES (%s ,%s )"
 	assert args == ["Tom Hanks", 1960]
 
+def test_retrieve(svc):
+
+	# When
+	res = svc.retrieve("s23_w4111_hw2_yy3242", "name_basics_all", {"primaryName": "B.J. Hogg"}, ["birthYear", "deathYear"])
+
+	assert res == [{"birthYear": '1955', 'deathYear': '2020'}]
+
+def test_create_update_and_delete(svc):
+
+	# Given
+	newValues = {"nconst": "nm0000000", "primaryName": "Tom Hanks", "birthYear": 1960}
+
+	# When
+	svc.create("s23_w4111_hw2_yy3242", "name_basics_all", newValues)
+
+	# Then
+	assert svc.retrieve("s23_w4111_hw2_yy3242", "name_basics_all", {"nconst": "nm0000000"}, ["primaryName", "birthYear"]) == [{'primaryName': 'Tom Hanks', 'birthYear': '1960'}]
+
+	# When
+	svc.update("s23_w4111_hw2_yy3242", "name_basics_all", {"nconst": "nm0000000"}, {"primaryName": "Me", "birthYear": 1900})
+
+	# Then
+	assert svc.retrieve("s23_w4111_hw2_yy3242", "name_basics_all", {"nconst": "nm0000000"}, ["primaryName", "birthYear"]) == [{'primaryName': 'Me', 'birthYear': '1900'}]
+
+	# When
+	svc.delete("s23_w4111_hw2_yy3242", "name_basics_all", {"nconst": "nm0000000"})
+
+	# Then
+	assert not svc.retrieve("s23_w4111_hw2_yy3242", "name_basics_all", {"nconst": "nm0000000"}, ["primaryName", "birthYear"])
