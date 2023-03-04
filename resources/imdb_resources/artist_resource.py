@@ -14,270 +14,299 @@ from resources.base_application_resource import BaseResource, Link
 
 
 class Artist(BaseModel):
-    """
-    The model/data transfer object for a single entry from name_basics.
+	"""
+	The model/data transfer object for a single entry from name_basics.
 
-    Prof. Ferguson modified the format from the downloaded TSV file to produce a better
-    relational/object schema.
-    """
+	Prof. Ferguson modified the format from the downloaded TSV file to produce a better
+	relational/object schema.
+	"""
 
-    # Primary key.
-    nconst: str
+	# Primary key.
+	nconst: str
 
-    # TODO All of the name stuff might be better handled using an embedded class.
-    # This would handle a name of the form "Dr. Donald Francis Ferguson IV (Darth Don)
-    # See https://pypi.org/project/nameparser/ for what the fields mean.
-    #
-    # title: Union[str, None] = None
-    # first_name: Union[str, None] = None
-    # middle_name: Union[str, None] = None
-    # last_name: str = None
-    # suffix: Union[str, None] = None
-    #   nickname: Union[str, None] = None
-    # full_name: str = None
+	# TODO All of the name stuff might be better handled using an embedded class.
+	# This would handle a name of the form "Dr. Donald Francis Ferguson IV (Darth Don)
+	# See https://pypi.org/project/nameparser/ for what the fields mean.
+	#
+	# title: Union[str, None] = None
+	# first_name: Union[str, None] = None
+	# middle_name: Union[str, None] = None
+	# last_name: str = None
+	# suffix: Union[str, None] = None
+	#   nickname: Union[str, None] = None
+	# full_name: str = None
 
-    # birth_year: str = None
-    # death_year: str = None
+	# birth_year: str = None
+	# death_year: str = None
 
-    primaryName: Union[str, None] = None
-    birthYear: Union[str, None] = None
-    deathYear: Union[str, None] = None
+	primaryName: Union[str, None] = None
+	birthYear: Union[str, None] = None
+	deathYear: Union[str, None] = None
 
-    class Config:
+	class Config:
 
-        # The sample response for OpenAPI docs.
-        #
-        schema_extra = {
-            """
-            "example": {
-                "nconst": "nm0000001",
-                "title": "Dr.",
-                "first_name": "Boris",
-                "middle_name": "Alexander",
-                "last_name": "Badenov",
-                "suffix": "III",
-                "nick_name": "Bubba",
-                "full_name": "Boris Badenov",
-                "birth_year": "1900",
-                "death_year": "2000"
-            }
-            """
-            "example": {
-                "nconst": "nm3586035",
-                "primaryName": "Maise Williams",
-                "birthYear": "1997",
-                "deathYear": None
-            }
-        }
+		# The sample response for OpenAPI docs.
+		#
+		schema_extra = {
+			"""
+			"example": {
+				"nconst": "nm0000001",
+				"title": "Dr.",
+				"first_name": "Boris",
+				"middle_name": "Alexander",
+				"last_name": "Badenov",
+				"suffix": "III",
+				"nick_name": "Bubba",
+				"full_name": "Boris Badenov",
+				"birth_year": "1900",
+				"death_year": "2000"
+			}
+			"""
+			"example": {
+				"nconst": "nm3586035",
+				"primaryName": "Maise Williams",
+				"birthYear": "1997",
+				"deathYear": None
+			}
+		}
 
 
 class ArtistRsp(BaseModel):
-    """
-    A class implementing a HATEOAS pattern for return GET /artists?query string
-    """
+	"""
+	A class implementing a HATEOAS pattern for return GET /artists?query string
+	"""
 
-    # A data object with the Artist information.
-    data: Artist
+	# A data object with the Artist information.
+	data: Artist
 
-    # Links associated with the response.
-    links: List[Link]
+	# Links associated with the response.
+	links: List[Link]
 
-    class Config:
-        schema_extra = {
-            "example": {
-                "data": {
-                    "nconst": "nm3586035",
-                    "primaryName": "Maise Williams",
-                    "birthYear": "1997",
-                    "deathYear": None
-                },
-                "links": [
-                    {"rel": "known_for_titles", "href": "/api/artists/nm0000001/known_for_titles"},
-                    {"rel": "primary_professions", "href": "/api/artists/nm0000001/primary_professions"},
-                    {"rel": "self", "href": "/api/artists/nm0000001"}
-                ]
-            }
-        }
+	class Config:
+		schema_extra = {
+			"example": {
+				"data": {
+					"nconst": "nm3586035",
+					"primaryName": "Maise Williams",
+					"birthYear": "1997",
+					"deathYear": None
+				},
+				"links": [
+					{"rel": "known_for_titles", "href": "/api/artists/nm0000001/known_for_titles"},
+					{"rel": "primary_professions", "href": "/api/artists/nm0000001/primary_professions"},
+					{"rel": "self", "href": "/api/artists/nm0000001"}
+				]
+			}
+		}
 
 
 class ArtistResource(BaseResource):
-    """
-    Implement the Artist Resource
-    """
+	"""
+	Implement the Artist Resource
+	"""
 
-    def __init__(self, context):
-        super().__init__(context)
-        print(context)
-        self.key_column = context["key_column"]
-        self.database = context["database"]
-        self.collection = context["collection"]
+	def __init__(self, context):
+		super().__init__(context)
+		print(context)
+		self.key_column = context["key_column"]
+		self.database = context["database"]
+		self.collection = context["collection"]
 
-    # Implements getting a single artists based on primary key.
-    # Corresponds to GET /api/artists/nm0000001
-    #
-    def get_by_key(self, key):
-        """
+	# Implements getting a single artists based on primary key.
+	# Corresponds to GET /api/artists/nm0000001
+	#
+	def get_by_key(self, key):
+		"""
 
-        :param key: The value of the primary key/ID in the collection.
-        :return: An ArtistRsp with the data and links.
-            TODO Need to convert to a 404 somewhere.
-        """
+		:param key: The value of the primary key/ID in the collection.
+		:return: An ArtistRsp with the data and links.
+			TODO Need to convert to a 404 somewhere.
+		"""
 
-        result = None
+		result = None
 
-        ds = self.context['data_service']
+		ds = self.context['data_service']
 
-        predicate = {self.key_column: key}
+		predicate = {self.key_column: key}
 
-        result = ds.retrieve(self.database, self.collection, predicate, None)
+		result = ds.retrieve(self.database, self.collection, predicate, None)
 
-        # Get on a path like /api/artists/id returns a single resource.
-        # The collection query returns a list of matching resources.
-        # Need to convert to a single element.
-        #
-        if result:
-            result = result[0]
-            tmp = dict()
-            tmp["data"] = result
+		# Get on a path like /api/artists/id returns a single resource.
+		# The collection query returns a list of matching resources.
+		# Need to convert to a single element.
+		#
+		if result:
+			result = result[0]
+			tmp = dict()
+			tmp["data"] = result
 
-            # This is pretty lazy and could be handled by config information.
-            #
-            tmp["links"] = [
-                {"rel": "primaryProfessions", "href": "/api/artists/" + key + "/primaryProfession"},
-                {"rel": "knownForTitles", "href": "/api/artists/" + key + "/knownForTitles"},
-                {"rel": "self", "href": "/api/artists/" + key}
-            ]
+			# This is pretty lazy and could be handled by config information.
+			#
+			tmp["links"] = [
+				{"rel": "primaryProfessions", "href": "/api/artists/" + key + "/primaryProfession"},
+				{"rel": "knownForTitles", "href": "/api/artists/" + key + "/knownForTitles"},
+				{"rel": "self", "href": "/api/artists/" + key}
+			]
 
-            # Create the response model from the dictionary.
-            result = ArtistRsp(**tmp)
+			# Create the response model from the dictionary.
+			result = ArtistRsp(**tmp)
 
-        return result
+		return result
 
-    def get(self, primaryName=None, birthYear=None, deathYear=None):
+	def get(self, primaryName=None, birthYear=None, deathYear=None):
 
-        result = None
+		result = None
 
-        ds = self.context['data_service']
+		ds = self.context['data_service']
 
-        predicate = dict()
+		predicate = dict()
 
-        if primaryName:
-            predicate['primaryName'] = primaryName
-        if birthYear:
-            if (birthYear < '1900') or (birthYear > '2023'):
-                raise ValueError("Bad birthYear")
+		if primaryName:
+			predicate['primaryName'] = primaryName
+		if birthYear:
+			if (birthYear < '1900') or (birthYear > '2023'):
+				raise ValueError("Bad birthYear")
 
-            predicate['birthYear'] = birthYear
-        if deathYear:
-            predicate['deathYear'] = deathYear
+			predicate['birthYear'] = birthYear
+		if deathYear:
+			predicate['deathYear'] = deathYear
 
-        result = ds.retrieve(self.database, self.collection, predicate, None)
+		result = ds.retrieve(self.database, self.collection, predicate, None)
 
-        # Get on a path like /api/artists/id returns a single resource.
-        # The collection query returns a list of matching resources.
-        # Need to convert to a single element.
-        #
-        if result:
-            # result = result[0]
-            tmp = dict()
-            tmp["data"] = result
+		# Get on a path like /api/artists/id returns a single resource.
+		# The collection query returns a list of matching resources.
+		# Need to convert to a single element.
+		#
+		if result:
+			# result = result[0]
+			tmp = dict()
+			tmp["data"] = result
 
-            # This is pretty lazy and could be handled by config information.
-            #
-            tmp["links"] = [
-                #{"rel": "primaryProfessions", "href": "/api/artists/" + key + "/primaryProfession"},
-                #{"rel": "knownForTitles", "href": "/api/artists/" + key + "/knownForTitles"},
-                #{"rel": "self", "href": "/api/artists/" + key}
-            ]
+			# This is pretty lazy and could be handled by config information.
+			#
+			tmp["links"] = [
+				#{"rel": "primaryProfessions", "href": "/api/artists/" + key + "/primaryProfession"},
+				#{"rel": "knownForTitles", "href": "/api/artists/" + key + "/knownForTitles"},
+				#{"rel": "self", "href": "/api/artists/" + key}
+			]
 
-            # Create the response model from the dictionary.
-            result = ArtistRsp(**tmp)
+			# Create the response model from the dictionary.
+			result = ArtistRsp(**tmp)
 
-        return result
+		return result
 
-    def delete(self, primaryName=None, birthYear=None, deathYear=None):
+	def delete(self, primaryName=None, birthYear=None, deathYear=None):
 
-        result = None
+		result = None
 
-        ds = self.context['data_service']
+		ds = self.context['data_service']
 
-        predicate = dict()
+		predicate = dict()
 
-        if primaryName:
-            predicate['primaryName'] = primaryName
-        if birthYear:
-            if (birthYear < '1900') or (birthYear > '2023'):
-                raise ValueError("Bad birthYear")
+		if primaryName:
+			predicate['primaryName'] = primaryName
+		if birthYear:
+			if (birthYear < '1900') or (birthYear > '2023'):
+				raise ValueError("Bad birthYear")
 
-            predicate['birthYear'] = birthYear
-        if deathYear:
-            predicate['deathYear'] = deathYear
+			predicate['birthYear'] = birthYear
+		if deathYear:
+			predicate['deathYear'] = deathYear
 
-        result = ds.delete(self.database, self.collection, predicate)
+		result = ds.delete(self.database, self.collection, predicate)
 
-        # Get on a path like /api/artists/id returns a single resource.
-        # The collection query returns a list of matching resources.
-        # Need to convert to a single element.
-        #
-        if result:
-            # result = result[0]
-            tmp = dict()
-            tmp["data"] = result
+		# Get on a path like /api/artists/id returns a single resource.
+		# The collection query returns a list of matching resources.
+		# Need to convert to a single element.
+		#
+		if result:
+			# result = result[0]
+			tmp = dict()
+			tmp["data"] = result
 
-            # This is pretty lazy and could be handled by config information.
-            #
-            tmp["links"] = [
-                #{"rel": "primaryProfessions", "href": "/api/artists/" + key + "/primaryProfession"},
-                #{"rel": "knownForTitles", "href": "/api/artists/" + key + "/knownForTitles"},
-                #{"rel": "self", "href": "/api/artists/" + key}
-            ]
+			# This is pretty lazy and could be handled by config information.
+			#
+			tmp["links"] = [
+				#{"rel": "primaryProfessions", "href": "/api/artists/" + key + "/primaryProfession"},
+				#{"rel": "knownForTitles", "href": "/api/artists/" + key + "/knownForTitles"},
+				#{"rel": "self", "href": "/api/artists/" + key}
+			]
 
-            # Create the response model from the dictionary.
-            result = ArtistRsp(**tmp)
+			# Create the response model from the dictionary.
+			result = ArtistRsp(**tmp)
 
-        return result
-    
+		return result
+	
 
 
-    def update(self, newValues, primaryName=None, birthYear=None, deathYear=None, ):
+	def update(self, newValues, primaryName=None, birthYear=None, deathYear=None):
 
-        result = None
+		result = None
 
-        ds = self.context['data_service']
+		ds = self.context['data_service']
 
-        predicate = dict()
+		predicate = dict()
 
-        if primaryName:
-            predicate['primaryName'] = primaryName
-        if birthYear:
-            if (birthYear < '1900') or (birthYear > '2023'):
-                raise ValueError("Bad birthYear")
+		if primaryName:
+			predicate['primaryName'] = primaryName
+		if birthYear:
+			if (birthYear < '1900') or (birthYear > '2023'):
+				raise ValueError("Bad birthYear")
 
-            predicate['birthYear'] = birthYear
-        if deathYear:
-            predicate['deathYear'] = deathYear
+			predicate['birthYear'] = birthYear
+		if deathYear:
+			predicate['deathYear'] = deathYear
 
-        result = ds.update(self.database, self.collection, predicate, newValues)
+		result = ds.update(self.database, self.collection, predicate, newValues)
 
-        # Get on a path like /api/artists/id returns a single resource.
-        # The collection query returns a list of matching resources.
-        # Need to convert to a single element.
-        #
-        if result:
-            # result = result[0]
-            tmp = dict()
-            tmp["data"] = result
+		# Get on a path like /api/artists/id returns a single resource.
+		# The collection query returns a list of matching resources.
+		# Need to convert to a single element.
+		#
+		if result:
+			# result = result[0]
+			tmp = dict()
+			tmp["data"] = result
 
-            # This is pretty lazy and could be handled by config information.
-            #
-            tmp["links"] = [
-                #{"rel": "primaryProfessions", "href": "/api/artists/" + key + "/primaryProfession"},
-                #{"rel": "knownForTitles", "href": "/api/artists/" + key + "/knownForTitles"},
-                #{"rel": "self", "href": "/api/artists/" + key}
-            ]
+			# This is pretty lazy and could be handled by config information.
+			#
+			tmp["links"] = [
+				#{"rel": "primaryProfessions", "href": "/api/artists/" + key + "/primaryProfession"},
+				#{"rel": "knownForTitles", "href": "/api/artists/" + key + "/knownForTitles"},
+				#{"rel": "self", "href": "/api/artists/" + key}
+			]
 
-            # Create the response model from the dictionary.
-            result = ArtistRsp(**tmp)
+			# Create the response model from the dictionary.
+			result = ArtistRsp(**tmp)
 
-        return result
-    
+		return result
+	
+	def post(self, newValues):
+
+		result = None
+
+		ds = self.context['data_service']
+
+		result = ds.update(self.database, self.collection, newValues)
+
+		# Get on a path like /api/artists/id returns a single resource.
+		# The collection query returns a list of matching resources.
+		# Need to convert to a single element.
+		#
+		if result:
+			# result = result[0]
+			tmp = dict()
+			tmp["data"] = result
+
+			# This is pretty lazy and could be handled by config information.
+			#
+			tmp["links"] = [
+				#{"rel": "primaryProfessions", "href": "/api/artists/" + key + "/primaryProfession"},
+				#{"rel": "knownForTitles", "href": "/api/artists/" + key + "/knownForTitles"},
+				#{"rel": "self", "href": "/api/artists/" + key}
+			]
+
+			# Create the response model from the dictionary.
+			result = ArtistRsp(**tmp)
+
+		return result
