@@ -878,5 +878,21 @@
     "friendly": true,
     "role": "Professor",
     "school": "CC"
+  },
+  {
+    "first_name": "Donald",
+    "last_name": "Ferguson",
+    "email": "sauron@mordor.gov",
+    "friendly": true,
+    "role": "Professor",
+    "school": "CC"
+  },
+  {
+    "first_name": "Angus",
+    "last_name": "Ferguson",
+    "email": "nazgul_king@mordor.gov",
+    "friendly": true,
+    "role": "Professor",
+    "school": "CC"
   }
 ]

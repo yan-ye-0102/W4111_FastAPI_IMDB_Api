@@ -259,7 +259,7 @@ class MySQLDataService(BaseDataService):
 		:return: A parameterized select statement and the args for the statement.
 		"""
 		wc, args = MySQLDataService.predicate_to_where_clause_args(predicate)
-		sc, args2 = MySQLDataService.predicate_to_where_clause_args(new_values)
+		sc, args2 = MySQLDataService.predicate_to_set_clause_args(new_values)
 		query=f"UPDATE {database}.{collection}{sc}{wc}"
 		return query, args2 + args
 	
@@ -280,7 +280,7 @@ class MySQLDataService(BaseDataService):
 		column_names = ",".join(new_data.keys())
 		placeholder = "%s " * len(new_data)
 		query = f"INSERT INTO {database}.{collection} ({column_names}) VALUES ({placeholder})"
-		return query, new_data.values()
+		return query, list(new_data.values())
 
 
 	def retrieve(self, database, collection, predicate, project):
