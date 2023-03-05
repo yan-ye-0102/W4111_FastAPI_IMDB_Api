@@ -3,16 +3,18 @@
 # The simplifies development in some cases because we can code to the base class.
 #
 
+import copy
+
 # Enable Abstract Base Class
 # https://www.educative.io/answers/what-is-the-abstract-base-class-in-python
 #
 from abc import ABC
 
-import copy
-
 # Use pydantic, especially for OpenAPI/models, type hints, ... ...
 from typing import List, Union
+
 from pydantic import BaseModel
+
 
 # The Links section for a HATEOAS REST response.
 #
@@ -41,4 +43,3 @@ class BaseResource(ABC):
         super().__init__()
 
         self.context = copy.deepcopy(context)
-

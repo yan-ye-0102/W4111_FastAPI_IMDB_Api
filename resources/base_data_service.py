@@ -17,6 +17,7 @@ class BaseDataServiceConfig(ABC):
 
     Just a placeholder for now.
     """
+
     def __init__(self, config):
         self.config = config
 
@@ -26,6 +27,7 @@ class BaseDataService(ABC):
     A base class for defining implementations for create, retrieve, update and delete (CRUD) for databases and
     data sources supporting the application.
     """
+
     def __init__(self, config):
         """
 
@@ -113,4 +115,3 @@ class BaseDataService(ABC):
         :return: The number of entities effected.
         """
         pass
-

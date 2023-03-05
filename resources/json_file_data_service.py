@@ -1,18 +1,16 @@
+import copy
 import json
 import os.path
-import copy
 
 from resources.base_data_service import BaseDataService, BaseDataServiceConfig
 
 
 class JSONDataServiceConfig(BaseDataServiceConfig):
-
     def __init__(self, config):
         super().__init__(config)
 
 
 class JSONFileDataService(BaseDataService):
-
     def __init__(self, config: JSONDataServiceConfig):
         super().__init__(config)
 
@@ -53,7 +51,6 @@ class JSONFileDataService(BaseDataService):
         with open(full_fn, "w") as out_file:
             json.dump(the_data, out_file, indent=2)
 
-
     @staticmethod
     def matches_template(json_object, predicate):
         """
@@ -71,17 +68,14 @@ class JSONFileDataService(BaseDataService):
 
         # On test if there is a predicate.
         if predicate:
-
             # For each key, value pair in the dictionary.
             for k, v in predicate.items():
-
                 # Using get() allows return None instead of trigger an exception if I used json_object[k]
                 # and there was no entry for k.
                 tmp_v = json_object.get(k, None)
 
                 # There is no element to match or the values are not the same.
                 if tmp_v is None or tmp_v != v:
-
                     # The element does not match the template. We can stop checking other values.
                     result = False
                     break
@@ -202,5 +196,3 @@ class JSONFileDataService(BaseDataService):
         self.save(database, collection, coll)
 
         return count
-
-

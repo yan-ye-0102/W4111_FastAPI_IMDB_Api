@@ -21,17 +21,16 @@ def t_where_clause():
 def t_build_sql():
     predicate = {"nameLast": "Williams", "nameFirst": "Ted"}
     svc = get_svc()
-    res = svc.retrieve("lahmansbaseballdb", "people",
-                                 predicate,
-                                 ["nameLast", "nameFirst", "birthCity"])
+    res = svc.retrieve(
+        "lahmansbaseballdb", "people", predicate, ["nameLast", "nameFirst", "birthCity"]
+    )
     print("t_build_sql: clause=", res)
 
 
 def t_build_delete():
     predicate = {"primaryName": "Tom Hanks", "birthYear": 1960}
     svc = get_svc()
-    res = svc.build_delete("s23_w4111_hw2_yy3242", "name_basics_all",
-                                 predicate)
+    res = svc.build_delete("s23_w4111_hw2_yy3242", "name_basics_all", predicate)
 
     print("t_build_delete: clause=", res)
 

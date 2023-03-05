@@ -4,3 +4,4 @@ PyMySQL==1.0.2
 uvicorn==0.20.0
 pytest
 black
+isort
