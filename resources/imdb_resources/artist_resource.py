@@ -76,7 +76,7 @@ class ArtistRsp(BaseModel):
     """
 
     # A data object with the Artist information.
-    data: Artist
+    data: List[Artist]
 
     # Links associated with the response.
     links: List[Link]
@@ -141,7 +141,6 @@ class ArtistResource(BaseResource):
         # Need to convert to a single element.
         #
         if result:
-            result = result[0]
             tmp = dict()
             tmp["data"] = result
 
@@ -199,7 +198,6 @@ class ArtistResource(BaseResource):
                 # {"rel": "knownForTitles", "href": "/api/artists/" + key + "/knownForTitles"},
                 # {"rel": "self", "href": "/api/artists/" + key}
             ]
-
             # Create the response model from the dictionary.
             result = ArtistRsp(**tmp)
 
@@ -291,8 +289,15 @@ class ArtistResource(BaseResource):
         result = None
 
         ds = self.context["data_service"]
-
-        result = ds.update(self.database, self.collection, newValues)
+        all_keys = ds.retrieve(self.database, self.collection, None, ["nconst"])
+        if all_keys:
+                all_keys = [i['nconst'] for i in all_keys]
+                all_keys.sort()
+                new_key = "nm" + "0"*(7 - len(str(int(all_keys[-1][2:]) + 1))) + str(int(all_keys[-1][2:]) + 1)
+        else:
+            new_key = "nm0000000"
+        newValues["nconst"] = new_key
+        result = ds.create(self.database, self.collection, newValues)
 
         # Get on a path like /api/artists/id returns a single resource.
         # The collection query returns a list of matching resources.
