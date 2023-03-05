@@ -76,7 +76,7 @@ class ArtistRsp(BaseModel):
     """
 
     # A data object with the Artist information.
-    data: List[Artist]
+    data: Artist
 
     # Links associated with the response.
     links: List[Link]
@@ -141,6 +141,7 @@ class ArtistResource(BaseResource):
         # Need to convert to a single element.
         #
         if result:
+            result = result[0]
             tmp = dict()
             tmp["data"] = result
 
@@ -185,23 +186,25 @@ class ArtistResource(BaseResource):
         # Get on a path like /api/artists/id returns a single resource.
         # The collection query returns a list of matching resources.
         # Need to convert to a single element.
-        #
+        
+        final_result = []
         if result:
             # result = result[0]
-            tmp = dict()
-            tmp["data"] = result
+            for i in result:
+                tmp = dict()
+                tmp["data"] = i
 
             # This is pretty lazy and could be handled by config information.
             #
-            tmp["links"] = [
-                # {"rel": "primaryProfessions", "href": "/api/artists/" + key + "/primaryProfession"},
-                # {"rel": "knownForTitles", "href": "/api/artists/" + key + "/knownForTitles"},
-                # {"rel": "self", "href": "/api/artists/" + key}
-            ]
+                tmp["links"] = [
+                {"rel": "primaryProfessions", "href": "/api/artists/" + i['nconst'] + "/primaryProfession"},
+                {"rel": "knownForTitles", "href": "/api/artists/" + i['nconst'] + "/knownForTitles"},
+                {"rel": "self", "href": "/api/artists/" + i['nconst']}
+                ]
             # Create the response model from the dictionary.
-            result = ArtistRsp(**tmp)
+                final_result.append(ArtistRsp(**tmp))
 
-        return result
+        return final_result
 
     def delete(self, primaryName=None, birthYear=None, deathYear=None):
         result = None
@@ -221,26 +224,6 @@ class ArtistResource(BaseResource):
             predicate["deathYear"] = deathYear
 
         result = ds.delete(self.database, self.collection, predicate)
-
-        # Get on a path like /api/artists/id returns a single resource.
-        # The collection query returns a list of matching resources.
-        # Need to convert to a single element.
-        #
-        if result:
-            # result = result[0]
-            tmp = dict()
-            tmp["data"] = result
-
-            # This is pretty lazy and could be handled by config information.
-            #
-            tmp["links"] = [
-                # {"rel": "primaryProfessions", "href": "/api/artists/" + key + "/primaryProfession"},
-                # {"rel": "knownForTitles", "href": "/api/artists/" + key + "/knownForTitles"},
-                # {"rel": "self", "href": "/api/artists/" + key}
-            ]
-
-            # Create the response model from the dictionary.
-            result = ArtistRsp(**tmp)
 
         return result
 
@@ -267,22 +250,6 @@ class ArtistResource(BaseResource):
         # The collection query returns a list of matching resources.
         # Need to convert to a single element.
         #
-        if result:
-            # result = result[0]
-            tmp = dict()
-            tmp["data"] = result
-
-            # This is pretty lazy and could be handled by config information.
-            #
-            tmp["links"] = [
-                # {"rel": "primaryProfessions", "href": "/api/artists/" + key + "/primaryProfession"},
-                # {"rel": "knownForTitles", "href": "/api/artists/" + key + "/knownForTitles"},
-                # {"rel": "self", "href": "/api/artists/" + key}
-            ]
-
-            # Create the response model from the dictionary.
-            result = ArtistRsp(**tmp)
-
         return result
 
     def post(self, newValues):
@@ -297,26 +264,5 @@ class ArtistResource(BaseResource):
         else:
             new_key = "nm0000000"
         newValues["nconst"] = new_key
-        result = ds.create(self.database, self.collection, newValues)
-
-        # Get on a path like /api/artists/id returns a single resource.
-        # The collection query returns a list of matching resources.
-        # Need to convert to a single element.
-        #
-        if result:
-            # result = result[0]
-            tmp = dict()
-            tmp["data"] = result
-
-            # This is pretty lazy and could be handled by config information.
-            #
-            tmp["links"] = [
-                # {"rel": "primaryProfessions", "href": "/api/artists/" + key + "/primaryProfession"},
-                # {"rel": "knownForTitles", "href": "/api/artists/" + key + "/knownForTitles"},
-                # {"rel": "self", "href": "/api/artists/" + key}
-            ]
-
-            # Create the response model from the dictionary.
-            result = ArtistRsp(**tmp)
-
-        return result
+        ds.create(self.database, self.collection, newValues)
+        return new_key

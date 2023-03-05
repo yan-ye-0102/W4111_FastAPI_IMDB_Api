@@ -369,5 +369,5 @@ class MySQLDataService(BaseDataService):
         """
         conn = self.get_connection()
         sql, args = self.build_create(database, collection, new_data)
-        result = self.run_q(sql, args, conn, True)
-        return [{"nconst":new_data["nconst"]}]
+        result = self.run_q(sql, args, conn, False)
+        return result
